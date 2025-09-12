@@ -1,5 +1,6 @@
 package com.algaworks.algasensors.device.management.api.controller;
 
+import com.algaworks.algasensors.device.management.api.client.SensorMonitoringClient;
 import com.algaworks.algasensors.device.management.api.model.SensorInput;
 import com.algaworks.algasensors.device.management.api.model.SensorOutput;
 import com.algaworks.algasensors.device.management.common.IdGenerator;
@@ -20,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class SensorController {
 
+     private final SensorMonitoringClient sensorMonitoringClient;
  private final SensorRepository sensorRepository;
 
     @GetMapping
@@ -76,6 +78,8 @@ public class SensorController {
         Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         sensorRepository.delete(sensor);
+
+        sensorMonitoringClient.disasbleMonitoring(sensorId);
     }
 
     @DeleteMapping("{sensorId}/enable")
@@ -86,6 +90,8 @@ public class SensorController {
         sensor.setEnabled(false);
         this.sensorRepository.save(sensor);
 
+        sensorMonitoringClient.disasbleMonitoring(sensorId);
+
     }
 
     @PutMapping("{sensorId}/enable")
@@ -95,6 +101,9 @@ public class SensorController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         sensor.setEnabled(true);
         this.sensorRepository.save(sensor);
+
+
+        sensorMonitoringClient.enableMonitoring(sensorId);
 
     }
 
